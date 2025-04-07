@@ -14,7 +14,14 @@ const sendTokenResponse=(user, statusCode, res)=>{
     }
     res.status(statusCode).cookie('token', token, option).json({
         success: true,
-        token
+        token,
+        user: {
+            id: user._id,       // Include user ID
+            name: user.name,    // Include name
+            email: user.email,  // Include email
+            role: user.role,     // Include role
+            payment: user.payment
+        }
     })
 }
 

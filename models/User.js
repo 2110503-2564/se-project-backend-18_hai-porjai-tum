@@ -24,6 +24,10 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
         select: false
     },
+    payment: {
+        type: Number,
+        default: 0
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     createdAt: {
