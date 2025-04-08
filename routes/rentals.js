@@ -1,10 +1,10 @@
 const express = require('express');
 
-const {getRentals, getRental, addRental, updateRental, deleteRental} = require('../controllers/rentals');
+const { getRentals, getRental, addRental, updateRental, deleteRental } = require('../controllers/rentals');
 
-const router = express.Router({mergeParams:true});
+const router = express.Router({ mergeParams: true });
 
-const {protect, authorize} = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 router.route('/').get(protect, getRentals)
     .post(protect, authorize('admin', 'user'), addRental);

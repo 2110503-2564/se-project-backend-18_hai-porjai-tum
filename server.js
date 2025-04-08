@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
-const {xss} = require('express-xss-sanitizer');
+const { xss } = require('express-xss-sanitizer');
 const rateLimit = require('express-rate-limit');
 const hpp = require("hpp");
 
@@ -15,7 +15,7 @@ const cron = require('node-cron');
 
 
 //Load env vars
-dotenv.config({path:'./config/config.env'});
+dotenv.config({ path: './config/config.env' });
 
 //Connect to database
 connectDB();
@@ -24,7 +24,7 @@ connectDB();
 const cars = require('./routes/cars');
 const rentals = require('./routes/rentals');
 const auth = require('./routes/auth');
-
+const user = require('./routes/users')
 const app = express();
 
 app.use(cors());
@@ -50,8 +50,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(xss());
 
 //Rate Limiting
-const limiter = rateLimit ({
-    windowMs: 10*60*1000,
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
     max: 100
 });
 app.use(limiter);
@@ -73,6 +73,7 @@ cron.schedule('0 8 * * *', () => {
 app.use('/api/v1/cars', cars);
 app.use('/api/v1/rentals', rentals);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/users', user);
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, 'module on port ', PORT));
@@ -81,5 +82,5 @@ const server = app.listen(PORT, console.log('Server running in ', process.env.NO
 process.on('unhandledRejection', (err, promise) => {
     console.log(`Error: ${err.message}`);
     //Close server & exist process
-    server.close(()=>process.exit(1));
+    server.close(() => process.exit(1));
 });
