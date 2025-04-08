@@ -1,24 +1,26 @@
-//@desc     Update current logged in user
-//@route    PUT /api/v1/users/update
+//@desc     Update current logged in user's payment
+//@route    PUT /api/v1/users/updatePayment
 //@access   Private
 const User = require('../models/User');
 
-exports.updateUser = async (req, res, next) => {
+exports.updateUserPayment = async (req, res, next) => {
     try {
-        // Prevent changes to sensitive fields
-        if (req.body.password || req.body.email) {
+        // Ensure that payment data is provided in the request body
+        if (typeof req.body.payment !== 'number') {
             return res.status(400).json({
                 success: false,
-                error: "You cannot update email or password from this route"
+                error: "You must provide a valid payment amount"
             });
         }
 
-        const userId = req.user.id; // Comes from protect middleware
+        const userId = req.user.id; // Comes from the protect middleware
 
-        const user = await User.findByIdAndUpdate(userId, req.body, {
-            new: true,
-            runValidators: true
-        });
+        // Find user by ID and update their payment (increment current payment)
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $inc: { payment: req.body.payment } }, // Increment current payment by the value in the request body
+            { new: true, runValidators: true }
+        );
 
         if (!user) {
             return res.status(404).json({ success: false, error: 'User not found' });
