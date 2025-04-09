@@ -37,6 +37,11 @@ const CarSchema = new mongoose.Schema({
         min: [1, 'Rating must be at least 1'],
         max: [5, 'Rating must be at most 5'],
         set: value => value ? Math.round(value * 10) / 10 : undefined
+    },
+    tier: {
+        type: String,
+        enum: ['Bronze', 'Diamond', 'Gold', 'Platinum', 'Silver'],
+        default: 'Bronze'
     }
 
     
