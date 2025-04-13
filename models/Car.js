@@ -26,7 +26,7 @@ const CarSchema = new mongoose.Schema({
     },
     demandFactor: {
         type: Number,
-        default: 1.0 
+        default: 1.0
     },
     picture: {
         type: String,
@@ -40,11 +40,11 @@ const CarSchema = new mongoose.Schema({
     },
     tier: {
         type: String,
-        enum: ['Bronze', 'Diamond', 'Gold', 'Platinum', 'Silver'],
+        enum: ['Bronze', 'Diamond', 'Gold', 'Ruby', 'Silver'],
         default: 'Bronze'
     }
 
-    
+
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
