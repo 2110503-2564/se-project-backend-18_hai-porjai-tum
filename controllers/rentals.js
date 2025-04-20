@@ -12,17 +12,26 @@ exports.getRentals = async (req, res, next) => {
         query = Rental.find({user:req.user.id}).populate({
             path:'car',
             select: 'name model picture pricePerDay tel rating'
+        }).populate({
+            path: 'user',
+            select: 'name role payment'
         }); 
     } else { //If youare an admin, you can see all!
         if(req.params.carId){
             query = Rental.find({ car: req.params.carId }).populate({
                 path:'car',
                 select: 'name model picture pricePerDay tel rating'
+            }).populate({
+                path: 'user',
+                select: 'name role payment'
             });
         }else{
             query = Rental.find().populate({
                 path:'car',
                 select: 'name model picture pricePerDay tel rating'
+            }).populate({
+                path: 'user',
+                select: 'name role payment'
             });
         }
         
@@ -49,6 +58,9 @@ exports.getRental = async (req, res, next) => {
         const rental = await Rental.findById(req.params.id).populate({
             path: 'car',
             select: 'name model picture description tel rating'
+        }).populate({
+            path: 'user',
+            select: 'name role payment'
         });
 
         if(!rental){

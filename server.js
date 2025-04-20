@@ -26,45 +26,6 @@ const rentals = require('./routes/rentals');
 const auth = require('./routes/auth');
 const user = require('./routes/users')
 const app = express();
-const server = http.createServer(app); // ⬅️ Wrap app with HTTP server
-
-const allowedOrigins = [
-    'http://localhost:3000',
-    'https://sw2-fontend.vercel.app/',
-  ];
-
-// Init Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true); // Allow request
-        } else {
-          callback(new Error('Not allowed by CORS')); // Block request
-        }
-      }, // Adjust based on your frontend origin
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
-
-// Socket.IO connection listener
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-  
-    socket.on('joinRoom', (room) => {
-      socket.join(room);
-      console.log(`${socket.id} joined room: ${room}`);
-    });
-  
-    socket.on('sendMessage', ({ room, message }) => {
-      io.to(room).emit('receiveMessage', message);
-    });
-  
-    socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
-    });
-});
 
 app.use(cors());
 
@@ -115,7 +76,7 @@ app.use('/api/v1/auth', auth);
 app.use('/api/v1/', user);
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, 'module on port ', PORT));
+const server = app.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, 'module on port ', PORT));
 
 //Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
