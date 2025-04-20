@@ -73,7 +73,7 @@ cron.schedule('0 8 * * *', () => {
 app.use('/api/v1/cars', cars);
 app.use('/api/v1/rentals', rentals);
 app.use('/api/v1/auth', auth);
-app.use('/api/v1/users', user);
+app.use('/api/v1/', user);
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, 'module on port ', PORT));
