@@ -7,6 +7,7 @@ const { protect, authorize } = require('../middleware/auth');
 // Self-update route (only needs to be logged in)
 router.put('/update', protect, updateUserPayment);
 router.get('/users', protect, authorize('admin'), getUsers)
-router.post('/setpayment', protect, authorize('admin'), setUserPayment)
+router.route('/:id/setpayment')  // Route for setting payment for a specific user
+    .post(protect, authorize('admin'), setUserPayment);
 
 module.exports = router;

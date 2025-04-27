@@ -38,12 +38,13 @@ exports.updateUserPayment = async (req, res, next) => {
 
 exports.setUserPayment = async (req, res, next) => {
     try {
-        const userId = req.user.id; // Comes from the protect middleware
+        const { id } = req.params; // Get the user ID from the route parameter
+        const { payment } = req.body; // Get the payment value from the body
 
-        // Find user by ID and set their payment to the value provided
+        // Find user by ID and set their payment
         const user = await User.findByIdAndUpdate(
-            userId,
-            { payment: req.body.payment }, // Set payment directly
+            id,  // Use the user ID from the route parameter
+            { payment },  // Update the payment field
             { new: true, runValidators: true }
         );
 
@@ -60,6 +61,8 @@ exports.setUserPayment = async (req, res, next) => {
         res.status(400).json({ success: false, error: 'Something went wrong' });
     }
 };
+
+
 
 exports.getUsers = async (req, res, next) => {
     try {
