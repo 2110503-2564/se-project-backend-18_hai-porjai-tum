@@ -36,6 +36,31 @@ exports.updateUserPayment = async (req, res, next) => {
     }
 };
 
+exports.setUserPayment = async (req, res, next) => {
+    try {
+        const userId = req.user.id; // Comes from the protect middleware
+
+        // Find user by ID and set their payment to the value provided
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { payment: req.body.payment }, // Set payment directly
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: user
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ success: false, error: 'Something went wrong' });
+    }
+};
+
 exports.getUsers = async (req, res, next) => {
     try {
         const users = await User.find();
