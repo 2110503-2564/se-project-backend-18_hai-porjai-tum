@@ -62,7 +62,11 @@ const rentals = require('./routes/rentals');
 const auth = require('./routes/auth');
 const user = require('./routes/users')
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // frontend origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
 
 //Utils
 const sendRentalReminders = require('./utils/rentalReminder');
