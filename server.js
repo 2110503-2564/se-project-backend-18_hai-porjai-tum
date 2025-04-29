@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
@@ -62,7 +61,6 @@ const rentals = require('./routes/rentals');
 const auth = require('./routes/auth');
 const user = require('./routes/users')
 
-app.use(cors());
 
 //Utils
 const sendRentalReminders = require('./utils/rentalReminder');
