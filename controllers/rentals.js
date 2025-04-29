@@ -1,54 +1,57 @@
 const Rental = require('../models/Rental');
 const Car = require('../models/Car');
-const {calculateRentalPrice} = require('../utils/CarPriceUpdate');
+//const {calculateRentalPrice} = require('../utils/CarPriceUpdate');
 
 //@desc     Get all rentals
 //@route    GET /api/v1/rentals
 //@access   Public
 exports.getRentals = async (req, res, next) => {
     let query;
-    //General users can see only their rentals!
-    if(req.user.role !== 'admin') {
-        query = Rental.find({user:req.user.id}).populate({
-            path:'car',
-            select: 'name model picture pricePerDay tel rating'
-        }).populate({
-            path: 'user',
-            select: 'name role payment'
-        }); 
-    } else { //If youare an admin, you can see all!
-        if(req.params.carId){
-            query = Rental.find({ car: req.params.carId }).populate({
-                path:'car',
-                select: 'name model picture pricePerDay tel rating'
-            }).populate({
-                path: 'user',
-                select: 'name role payment'
-            });
-        }else{
-            query = Rental.find().populate({
-                path:'car',
-                select: 'name model picture pricePerDay tel rating'
-            }).populate({
-                path: 'user',
-                select: 'name role payment'
-            });
-        }
-        
-    }
     try {
+        if (req.user.role !== 'admin') {
+            query = Rental.find({ user: req.user.id }).populate({
+                path: 'car',
+                select: 'name model picture pricePerDay tel rating'
+            }).populate({
+                path: 'user',
+                select: 'name role payment'
+            });
+        } else { 
+            if (req.params.carId) {
+                query = Rental.find({ car: req.params.carId }).populate({
+                    path: 'car',
+                    select: 'name model picture pricePerDay tel rating'
+                }).populate({
+                    path: 'user',
+                    select: 'name role payment'
+                });
+            } else {
+                query = Rental.find().populate({
+                    path: 'car',
+                    select: 'name model picture pricePerDay tel rating'
+                }).populate({
+                    path: 'user',
+                    select: 'name role payment'
+                });
+            }
+        }
+
         const rentals = await query;
 
         res.status(200).json({
-            success:true,
-            count:rentals.length,
+            success: true,
+            count: rentals.length,
             data: rentals
         });
     } catch (error) {
-        console (error);
-        return res.status(500).json({success:false, message:"Cannot find Rental"});
+        console.log('Error:', error);  // Log the error to inspect it
+        return res.status(500).json({
+            success: false,
+            message: 'Cannot find Rental'
+        });
     }
 };
+
 
 //@desc     Get single rental
 //@route    GET /api/v1/rentals/:id
@@ -63,17 +66,17 @@ exports.getRental = async (req, res, next) => {
             select: 'name role payment'
         });
 
-        if(!rental){
-            return res.status(404).json({success:false, message: `No appointment with the id of ${req.params.id}`}); 
+        if (!rental) {
+            return res.status(404).json({ success: false, message: `No appointment with the id of ${req.params.id}` });
         }
 
         res.status(200).json({
-            success:true,
+            success: true,
             data: rental
         });
-    } catch(error) {
+    } catch (error) {
         console.log(error);
-        return res.status(500).json({success:false, message: "Cannot find Rental"});
+        return res.status(500).json({ success: false, message: "Cannot find Rental" });
     }
 }
 
@@ -81,21 +84,21 @@ exports.getRental = async (req, res, next) => {
 //@route    POST /api/v1/rentals/:rentalId/rental
 //@access   Private
 exports.addRental = async (req, res, next) => {
-    try{
+    try {
         //add user Id to req.body
         req.body.user = req.user.id;
 
         //Check for existed rental
-        const existedRentals = await Rental.find({user:req.user.id});
+        const existedRentals = await Rental.find({ user: req.user.id });
 
         // console.log("---------------------------------");
         // console.log(existedRentals);
         // console.log(existedRentals.length);
 
         //If the user is not an admin, they can only create 3 rental.
-        if(existedRentals.length >= 3 && req.user.role !== 'admin'){
+        if (existedRentals.length >= 3 && req.user.role !== 'admin') {
             // console.log(2);
-            return res.status(400).json({success:false, message:`The user with ID ${req.params.carId} has already made 3 rental`});
+            return res.status(400).json({ success: false, message: `The user with ID ${req.params.carId} has already made 3 rental` });
         }
         // console.log(1);
 
@@ -103,8 +106,8 @@ exports.addRental = async (req, res, next) => {
 
         const car = await Car.findById(req.params.carId);
 
-        if(!car){
-            return res.status(404).json({success:false, message:`No car with the id of ${req.params.carId}`});
+        if (!car) {
+            return res.status(404).json({ success: false, message: `No car with the id of ${req.params.carId}` });
         }
 
 
@@ -126,19 +129,19 @@ exports.addRental = async (req, res, next) => {
         // const rentalPrice = await calculateRentalPrice(car, req.body.startDate);
         const startDate = new Date(req.body.pickupDate)
         const endDate = new Date(req.body.returnDate)
-        const rentalPrice = ((endDate - startDate)/(1000 * 60 * 60 * 24) + 1) * car.pricePerDay
+        const rentalPrice = ((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) * car.pricePerDay
 
-        const rental = await Rental.create({...req.body, assumePrice: rentalPrice});
-        
+        const rental = await Rental.create({ ...req.body, assumePrice: rentalPrice });
+
         // const rental = await Rental.create(req.body);
 
         res.status(200).json({
             success: true,
             data: rental
         });
-    } catch(error) {
+    } catch (error) {
         console.log(error);
-        return res.status(500).json({success:false, message: "Cannot create Rental"});
+        return res.status(500).json({ success: false, message: "Cannot create Rental" });
     }
 }
 
@@ -146,16 +149,16 @@ exports.addRental = async (req, res, next) => {
 //@route    PUT /api/v1/rentals/:id
 //@access   Private
 exports.updateRental = async (req, res, next) => {
-    try{
+    try {
         let rental = await Rental.findById(req.params.id);
 
-        if(!rental){
-            return res.status(404).json({success:false, message:`No Rental with the id of ${req.params.carId}`});
+        if (!rental) {
+            return res.status(404).json({ success: false, message: `No Rental with the id of ${req.params.carId}` });
         }
 
         //Make sure user is the rental owner
-        if(rental.user.toString() !== req.user.id && req.user.role !== 'admin'){
-            return res.status(401).json({success:false, message:`User ${req.params.carId} is not authorized to update this rental`});
+        if (rental.user.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(401).json({ success: false, message: `User ${req.params.carId} is not authorized to update this rental` });
         }
 
         // const car = await Car.findById(req.params.carId);
@@ -166,26 +169,26 @@ exports.updateRental = async (req, res, next) => {
         //     new:true,
         //     runValidators:true
         // });
-        
+
         const car = await Car.findById(rental.car);
         console.log(car)
 
         const startDate = new Date(req.body.pickupDate)
         const endDate = new Date(req.body.returnDate)
-        const rentalPrice = ((endDate - startDate)/(1000 * 60 * 60 * 24) + 1) * car.pricePerDay
+        const rentalPrice = ((endDate - startDate) / (1000 * 60 * 60 * 24) + 1) * car.pricePerDay
         req.body.assumePrice = rentalPrice
 
         rental = await Rental.findByIdAndUpdate(req.params.id, req.body, {
-            new:true,
-            runValidators:true
+            new: true,
+            runValidators: true
         });
         res.status(200).json({
             success: true,
             data: rental
         });
-    } catch(error) {
+    } catch (error) {
         console.log(error);
-        return res.status(500).json({success:false, message: 'Cannot update Rental'});
+        return res.status(500).json({ success: false, message: 'Cannot update Rental' });
     }
 }
 
@@ -193,16 +196,16 @@ exports.updateRental = async (req, res, next) => {
 //@route    DELETE /api/v1/rentals/:id
 //@access   Private
 exports.deleteRental = async (req, res, next) => {
-    try{
+    try {
         let rental = await Rental.findById(req.params.id);
 
-        if(!rental){
-            return res.status(404).json({success:false, message:`No Rental with the id of ${req.params.carId}`});
+        if (!rental) {
+            return res.status(404).json({ success: false, message: `No Rental with the id of ${req.params.carId}` });
         }
 
         //Make sure user is the rental owner
-        if(rental.user.toString() !== req.user.id && req.user.role !== 'admin'){
-            return res.status(401).json({success:false, message:`User ${req.params.carId} is not authorized to update this rental`});
+        if (rental.user.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(401).json({ success: false, message: `User ${req.params.carId} is not authorized to update this rental` });
         }
 
         await rental.deleteOne();
@@ -211,8 +214,8 @@ exports.deleteRental = async (req, res, next) => {
             success: true,
             data: {}
         });
-    } catch(error) {
+    } catch (error) {
         console.log(error);
-        return res.status(500).json({success:false, message: 'Cannot delete Rental'});
+        return res.status(500).json({ success: false, message: 'Cannot delete Rental' });
     }
 }

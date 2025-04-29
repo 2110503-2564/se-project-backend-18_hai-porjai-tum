@@ -9,7 +9,7 @@ const { xss } = require('express-xss-sanitizer');
 const rateLimit = require('express-rate-limit');
 const hpp = require("hpp");
 
-
+const app = require('./app');
 
 const cron = require('node-cron');
 
@@ -25,7 +25,6 @@ const cars = require('./routes/cars');
 const rentals = require('./routes/rentals');
 const auth = require('./routes/auth');
 const user = require('./routes/users')
-const app = express();
 
 app.use(cors());
 

@@ -36,7 +36,7 @@ const CarSchema = new mongoose.Schema({
         type: Number,
         min: [1, 'Rating must be at least 1'],
         max: [5, 'Rating must be at most 5'],
-        set: value => value ? Math.round(value * 10) / 10 : undefined
+        //set: value => value ? Math.round(value * 10) / 10 : undefined
     },
     tier: {
         type: String,
@@ -51,13 +51,13 @@ const CarSchema = new mongoose.Schema({
 });
 
 // Virtual field to calculate average rating (ทศนิยม 1 ตำแหน่ง)
-CarSchema.virtual('averageRating').get(function () {
-    if (!this.reviews || this.reviews.length === 0) {
-        return 0;
-    }
-    const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0);
-    return Math.round((sum / this.reviews.length) * 10) / 10; // ปัดเศษให้เป็นทศนิยม 1 ตำแหน่ง
-});
+// CarSchema.virtual('averageRating').get(function () {
+//     if (!this.reviews || this.reviews.length === 0) {
+//         return 0;
+//     }
+//     const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0);
+//     return Math.round((sum / this.reviews.length) * 10) / 10; // ปัดเศษให้เป็นทศนิยม 1 ตำแหน่ง
+// });
 
 
 
